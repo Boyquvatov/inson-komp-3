@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ovozli Ma'lumotlar Vizualizatsiyasi</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    #start-btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #waveform {
+      width: 100%;
+      height: 200px;
+      border: 1px solid #ccc;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ovozli Ma'lumotlar Vizualizatsiyasi</h1>
+  <button id="start-btn">Ovozni Boshlash</button>
+  <div id="waveform"></div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script>
+    let mic, fft;
+    let button;
+    let waveform;
+
+    function setup() {
+      createCanvas(windowWidth, 200);
+      button = select('#start-btn');
+      button.mousePressed(startListening);
+
+      mic = new p5.AudioIn();
+      mic.start();
+
+      fft = new p5.FFT();
+      fft.setInput(mic);
+    }
+
+    function draw() {
+      background(200);
+      stroke(255);
+      noFill();
+
+      waveform = fft.waveform();
+      beginShape();
+      for (let i = 0; i < waveform.length; i++) {
+        let x = map(i, 0, waveform.length, 0, width);
+        let y = map(waveform[i], -1, 1, 0, height);
+        vertex(x, y);
+      }
+      endShape();
+    }
+
+    function startListening() {
+      mic.start();
+      fft.setInput(mic);
+    }
+  </script>
+</body>
+</html>
