@@ -1,69 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ovozli Ma'lumotlar Vizualizatsiyasi</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
-    #start-btn {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    #waveform {
-      width: 100%;
-      height: 200px;
-      border: 1px solid #ccc;
-      margin-top: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forma Validatsiyasi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            font-size: 14px;
+            color: #555;
+            margin-top: 10px;
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .success {
+            color: green;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Ovozli Ma'lumotlar Vizualizatsiyasi</h1>
-  <button id="start-btn">Ovozni Boshlash</button>
-  <div id="waveform"></div>
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-  <script>
-    let mic, fft;
-    let button;
-    let waveform;
+    <div class="container">
+        <h2>Login Form</h2>
+        <form id="myForm">
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" name="email" required>
+            <span id="emailError" class="error"></span>
 
-    function setup() {
-      createCanvas(windowWidth, 200);
-      button = select('#start-btn');
-      button.mousePressed(startListening);
+            <label for="password">Parol:</label>
+            <input type="password" id="password" name="password" required>
+            <span id="passwordError" class="error"></span>
 
-      mic = new p5.AudioIn();
-      mic.start();
+            <button type="submit">Yuborish</button>
+        </form>
+        <span id="formSuccess" class="success"></span>
+    </div>
 
-      fft = new p5.FFT();
-      fft.setInput(mic);
-    }
+    <script>
+        document.getElementById("myForm").addEventListener("submit", function (event) {
+            event.preventDefault();  // Forma yuborilishini to'xtatish
 
-    function draw() {
-      background(200);
-      stroke(255);
-      noFill();
+            // Xatoliklar ro'yxati
+            let errors = {};
 
-      waveform = fft.waveform();
-      beginShape();
-      for (let i = 0; i < waveform.length; i++) {
-        let x = map(i, 0, waveform.length, 0, width);
-        let y = map(waveform[i], -1, 1, 0, height);
-        vertex(x, y);
-      }
-      endShape();
-    }
+            // E-mailni tekshirish
+            let email = document.getElementById("email").value;
+            let emailError = document.getElementById("emailError");
+            if (!validateEmail(email)) {
+                errors.email = "Noto'g'ri e-mail formati.";
+                emailError.textContent = errors.email;
+            } else {
+                emailError.textContent = "";
+            }
 
-    function startListening() {
-      mic.start();
-      fft.setInput(mic);
-    }
-  </script>
+            // Parolni tekshirish
+            let password = document.getElementById("password").value;
+            let passwordError = document.getElementById("passwordError");
+            if (password.length < 6) {
+                errors.password = "Parol kamida 6 ta belgidan iborat bo'lishi kerak.";
+                passwordError.textContent = errors.password;
+            } else {
+                passwordError.textContent = "";
+            }
+
+            // Agar xatoliklar bo'lsa, forma yuborilmaydi
+            if (Object.keys(errors).length === 0) {
+                // Formaning muvaffaqiyatli yuborilishi
+                document.getElementById("formSuccess").textContent = "Forma muvaffaqiyatli yuborildi!";
+                document.getElementById("email").value = '';  // Formani tozalash
+                document.getElementById("password").value = '';  // Formani tozalash
+            } else {
+                document.getElementById("formSuccess").textContent = '';  // Xatolik bo'lsa, muvaffaqiyat xabarini yashirish
+            }
+        });
+
+        // E-mail formatini tekshirish
+        function validateEmail(email) {
+            const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            return re.test(email);
+        }
+    </script>
 </body>
 </html>
